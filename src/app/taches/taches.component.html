@@ -1,0 +1,172 @@
+<div class="container">
+    <div class="row w-100 m-0">
+        <div class="col">
+            <div class="row">
+                <div class="col-3"></div>
+                <div class="col">
+                    <h5 class="mt-2 mb-4 text-center d-inline-block w-100" style="font-family: Marker Felt, fantasy; font-size: 28px; color: navy;">Gestion des tâches</h5>
+                </div>
+                <div class="col-3">
+                    <a routerLink="/taches/create-tache" class="float-right btn btn-info my-1">Ajouter une tâche</a>
+                </div>
+            </div>
+            <div class="body">
+                <div class="headker">
+                    <div class="row">
+                        <div class="col-sm form-group">
+                            <label style="color: navy;">Code marchée</label>
+                            <input [(ngModel)]="code_marchee" name="code_marchee" type="text" class="form-control" (change)="importMarcheeByCode($event)" required>
+                            <div class="alert alert-danger mt-2 p-1 px-2" *ngIf="err_marchee==true">{{err_msg}}</div>
+                        </div>
+                        <div class="col-sm form-group">
+                            <label style="color: navy;">Bon de commande</label>
+                            <select class="form-control" [(ngModel)]="bcId" name="bcId" (change)="importTachesByBcId($event)">
+                                <option *ngFor="let bc of bcs" value="{{bc.id}}">{{bc.id}} : {{bc.delais}} jours | {{bc.montant}}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+                <hr class="hr my-3 w-50 mx-auto"/>
+                <table class="my-3 table table-info table-striped table-bordered" *ngIf="bc_selected==true">
+                    <thead class="text-center">
+                        <tr>
+                            <th class="col">Code</th>
+                            <th class="col">Nom</th>
+                            <th class="col">Délais</th>
+                            <th class="col">Date de début</th>
+                            <th class="col">Coût</th>
+                            <th class="col">Elements</th>
+                            <th class="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let tc of taches">
+                            <td>{{tc.code}}</td>
+                            <td>{{tc.nom}}</td>
+                            <td>{{tc.delais}}</td>
+                            <td>{{tc.dateDebutNewBC}}</td>
+                            <td>{{tc?.cout}}</td>
+                            <td>
+                                <button class="btn btn-danger m-1" (click)="openArticles(tc)">Articles</button>
+                                <button class="btn btn-info m-1" (click)="openTachesPred(tc, 1)">Prédécesseurs</button>
+                            </td>
+                            <td>
+                                <button class="btn btn-warning" (click)="selectedTache=tc; edit_tache=true; openTachesPred(tc, null);"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="modal-articles" class="dialog" *ngIf="article_op==true">
+    <div class="content bg-white rounded shadow py-4 px-3 border w-75 h-75 mx-auto my-auto">
+        <h5 style="font-size: 20px; color: navy;">Articles spécifiés</h5>
+        <div class="body my-3 mx-auto px-2">
+            <div class="w-100 mx-auto">
+                <table class="my-3 table table-success table-striped table-bordered">
+                    <thead class="text-center">
+                        <tr>
+                            <th class="col">Code</th>
+                            <th class="col">Désignation</th>
+                            <th class="col">Prix</th>
+                            <th class="col">Quantité</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-center">
+                        <tr *ngFor="let art of articles">
+                            <td>{{art.articleData.code}}</td>
+                            <td>{{art.articleData.designation}}</td>
+                            <td>{{art.articleTache.prix}}</td>
+                            <td>{{art.articleTache.quantitee}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="bottom my-2 mx-5">
+            <button class="btn btn-default" (click)="article_op=false; articles=[];">Annuler</button>
+        </div>
+    </div>
+</div>
+
+
+
+<div id="modal-articles" class="dialog" *ngIf="tcpred_op==true">
+    <div class="content bg-white rounded shadow py-4 px-3 border w-75 h-75 mx-auto my-auto">
+        <h5 style="font-size: 20px; color: navy;">Prédécesseurs</h5>
+        <div class="body my-3 mx-auto px-2">
+            <div class="w-100 mx-auto">
+                <table class="my-3 table table-success table-striped table-bordered">
+                    <thead class="text-center">
+                        <tr>
+                            <th class="col">Code</th>
+                            <th class="col">Nom</th>
+                            <th class="col">Délais</th>
+                            <th class="col">Date de début</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-center">
+                        <tr *ngFor="let tp of tcpred">
+                            <td>{{tp.code}}</td>
+                            <td>{{tp.nom}}</td>
+                            <td>{{tp.delais}}</td>
+                            <td>{{tp.dateDebutNewBC}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="bottom my-2 mx-5">
+            <button class="btn btn-default" (click)="tcpred_op=false; tcpred=[];">Annuler</button>
+        </div>
+    </div>
+</div>
+
+
+<div id="modal-edit-tache" class="dialog" *ngIf="edit_tache==true">
+    <div class="content bg-white rounded shadow py-4 px-3 border w-50 mx-auto my-auto">
+        <h5 style="font-size: 20px; color: navy;">Modifier une tache</h5>
+        <div class="body my-3">
+            <form>
+                <div class="row w-100 mx-auto my-1">
+                    <div class="col-sm form-group">
+                        <label style="color: navy;">Tache</label>
+                        <input type="text" class="form-control" required [value]="selectedTache.nom" [disabled]="true">
+                    </div>
+                    <div class="col-sm-5 form-group">
+                        <label style="color: navy;">Date début</label>
+                        <input type="date" class="form-control" (change)="changeTache($event)" required [value]="selectedTache.dateDebutNewBC">
+                    </div>
+                </div>
+                <div class="row my-3 w-100 mx-auto">
+                    <div class="col-sm form-group">
+                        <div class="p-2 border">
+                            <h4 class="mt-2 mb-3" style="color: navy;">Prédécesseurs</h4>
+                            <div *ngFor="let tc of taches" class="my-1">
+                                <ng-container *ngIf="tc.id!=selectedTache.id">
+                                    <input
+                                        type="checkbox"
+                                        [checked]="verifyCheck(tc.id)"
+                                        (change)="changeStatPred($event, tc)"
+                                        [value]="tc.id"
+                                    >
+                                    <label class="mx-3" style="color: navy;">{{tc.nom}}</label>
+                                    <hr class="w-75 mx-auto my-2">
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <button class="btn btn-default" (click)="edit_tache=false;">Annuler</button>
+                    <button class="btn btn-success mx-3" type="submit" (click)="saveChanges()">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

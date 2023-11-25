@@ -1,0 +1,22 @@
+.dialog{
+    z-index: 99999;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: #7a7a7abb;
+}
+
+.dialog .content{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+}
+#modal-articles .content .body {
+    width: 90%;
+    overflow-y: scroll;
+    height: min-content;
+    height: 80%;
+}

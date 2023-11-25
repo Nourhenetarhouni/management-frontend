@@ -1,0 +1,13 @@
+addEntrep {
+    color: white;
+    background-color: #4b4b4b;
+    border: 1px solid black;
+}
+.err_msg{
+    color: #6b1515;
+    font-weight: bold;
+}
+.inpt_err{
+    border: 1px solid #d41b1b;
+    box-shadow: 0px 0px 4px #d41b1b;
+}

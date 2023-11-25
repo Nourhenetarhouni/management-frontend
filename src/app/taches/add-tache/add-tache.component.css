@@ -1,0 +1,86 @@
+.dialog{
+    z-index: 99999;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: #7a7a7abb;
+}
+
+.dialog .content{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+}
+#modal-add-article .content{
+    min-height: 320px;
+    max-height: 90%;
+}
+#modal-add-article .content .body {
+    width: 90%;
+    overflow-y: scroll;
+    height: min-content;
+    height: 80%;
+}
+#modal-add-article .bottom {
+    position: absolute;
+    bottom: 25px;
+    right: 25px;
+}
+#toast {
+    max-width: 400px;
+}
+#toast-token {
+    max-width: 450px;
+}
+#toast, #toast-token {
+    visibility: hidden;
+    height: 50px;
+    /*margin-left: -125px;*/
+    margin: auto;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 2px;
+
+    position: fixed;
+    z-index: 1;
+    left: 0;right:0;
+    bottom: 30px;
+    font-size: 17px;
+    white-space: nowrap;
+}
+#toast #img, #toast-token .img{
+	width: 80px;
+	height: 50px;
+    
+    float: left;
+    
+    padding-top: 16px;
+    padding-bottom: 16px;
+    
+    box-sizing: border-box;
+
+    
+    background-color: #111;
+    color: #fff;
+}
+#toast #desc, #toast-token .desc{
+
+    
+    color: #fff;
+    
+   
+    padding: 16px;
+    
+    overflow: hidden;
+	white-space: nowrap;
+}
+
+#toast.show, #toast-token.show {
+    visibility: visible;
+    -webkit-animation: fadein 0.5s, expand 0.5s 0.5s,stay 3s 1s, shrink 0.5s 2s, fadeout 0.5s 2.5s;
+    animation: fadein 0.5s, expand 0.5s 0.5s,stay 3s 1s, shrink 0.5s 4s, fadeout 0.5s 4.5s;
+}

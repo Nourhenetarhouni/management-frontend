@@ -1,0 +1,174 @@
+<div class="container" id="main-container">
+    <div class="container bootstrap snippets bootdeys">
+        <div class="row" id="user-profile">
+            <div class="col-sm">
+                <div class="main-box clearfix">
+                    <div class="profile-header">
+                        <h3><span> Information de l'Organisation </span></h3>
+                        <a routerLink="/cpm/editOrganisation/{{organisation.id}}" class="btn btn-primary edit-profile" style="color: black;">
+                            Modifier
+                        </a>
+                    </div>
+                    <div class="row profile-user-info">
+                        <div class="col-sm profile-social">
+                            <div class="row my-2 w-100 mx-0">
+                                <div class="col-sm my-1">
+                                    <div class="profile-user-details clearfix">
+                                        <div class="profile-user-details-label">
+                                            Name
+                                        </div>
+                                        <div class="profile-user-details-value">
+                                            {{organisation.nom}}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm my-1">
+                                    <div class="profile-user-details clearfix">
+                                        <div class="profile-user-details-label">
+                                            Code
+                                        </div>
+                                        <div class="profile-user-details-value">
+                                            {{organisation.code}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row my-2 w-100 mx-0">
+                                <div class="col-sm my-1">
+                                    <div class="profile-user-details clearfix">
+                                    <div class="profile-user-details-label">
+                                        Email
+                                    </div>
+                                    <div class="profile-user-details-value">
+                                        {{organisation.email}}
+                                    </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm my-1">
+                                    <div class="profile-user-details clearfix">
+                                        <div class="profile-user-details-label">
+                                            Adresse
+                                        </div>
+                                        <div class="profile-user-details-value">
+                                            <span *ngIf="organisation.pays!=null&&organisation.pays!=''">
+                                                {{organisation.pays}}, 
+                                            </span>
+                                            <span *ngIf="organisation.region!=null&&organisation.region!=''">
+                                                {{organisation.region}}, 
+                                            </span>
+                                            <span *ngIf="organisation.adresse!=null&&organisation.adresse!=''">
+                                                {{organisation.adresse}}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row my-2 w-100 mx-0">
+                                <div class="col-sm my-1">
+                                    <div class="profile-user-details clearfix">
+                                        <div class="profile-user-details-label">
+                                            Telephone
+                                        </div>
+                                        <div class="profile-user-details-value">
+                                            {{organisation.tel}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row my-2 w-100 mx-0">
+                                <div class="col-sm my-1">
+                                    <div class="profile-user-details clearfix">
+                                        <div class="profile-user-details-label">
+                                            Secteur
+                                        </div>
+                                        <div class="profile-user-details-value">
+                                            {{organisation.secteur_d_activite }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm my-1">
+                                    <div class="profile-user-details clearfix">
+                                        <div class="profile-user-details-label">
+                                            Type
+                                        </div>
+                                        <div class="profile-user-details-value">
+                                            {{organisation.type}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="my-5">
+                            <h3> Directeur generale  </h3>
+                            <div class="row my-2 w-100 mx-0">
+                                <div class="col-sm my-1">
+                                    <div class="profile-user-details clearfix">
+                                        <div class="profile-user-details-label">
+                                            Nom 
+                                        </div>
+                                        <div class="profile-user-details-value">
+                                            {{organisation.nomDG}}
+                                        </div>
+                                    </div>  
+                                </div>
+                                <div class="col-sm my-1">
+                                    <div class="profile-user-details clearfix">
+                                        <div class="profile-user-details-label">
+                                            tel
+                                        </div>
+                                        <div class="profile-user-details-value">
+                                            {{organisation.telDG}}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm my-1">
+                                    <div class="profile-user-details clearfix">
+                                        <div class="profile-user-details-label">
+                                            Email
+                                        </div>
+                                        <div class="profile-user-details-value">
+                                            {{organisation.emailDG}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="my-5">
+                            <h3>information de l'admin  </h3>
+                            <div class="row my-2 w-100 mx-0">
+                                <div class="col-sm my-1">
+                                    <div class="profile-user-details clearfix">
+                                        <div class="profile-user-details-label">
+                                            Nom
+                                        </div>
+                                        <div class="profile-user-details-value">
+                                            {{organisation.nomAdmin}}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm my-1">
+                                    <div class="profile-user-details clearfix">
+                                        <div class="profile-user-details-label">
+                                            tel
+                                        </div>
+                                        <div class="profile-user-details-value">
+                                            {{organisation.telAdmin}}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm my-1">
+                                    <div class="profile-user-details clearfix">
+                                        <div class="profile-user-details-label">
+                                            email
+                                        </div>
+                                        <div class="profile-user-details-value">
+                                            {{organisation.emailAdmin}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,301 @@
+<div class="container">
+    <div class="row w-100 m-0">
+        <div class="col">
+            <h5 class="mt-2 mb-4 text-center" style="font-family: Marker Felt, fantasy; font-size: 28px; color: navy;">Ajouter des taches</h5>
+            <form [formGroup]="choixBcForm" (ngSubmit)="confirmBc()">
+                <div class="row my-3">
+                    <div class="col-sm form-group">
+                        <label style="color: navy;">Code marchée</label>
+                        <input [disabled]="bc_confirmed==true" [ngModelOptions]="{standalone: true}" [(ngModel)]="code_marchee" name="code_marchee" type="text" class="form-control" (change)="importMarcheeByCode($event)" required>
+                        <div class="alert alert-danger mt-2 p-1 px-2" *ngIf="err_marchee==true">{{err_msg}}</div>
+                    </div>
+                    <div class="col-sm form-group">
+                        <label style="color: navy;">Bonde commande</label>
+                        <select class="form-control" formControlName="bondecommande_id" required>
+                            <option *ngFor="let bc of bcs" value="{{bc.id}}">{{bc.id}} : {{bc.delais}} jours | {{bc.montant}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row my-3">
+                    <div class="col-sm form-group">
+                        <button class="btn btn-secondary" *ngIf="bc_confirmed==false" type="submit">Valider</button>
+                    </div>
+                </div>
+            </form>
+            <div *ngIf="bc_confirmed==true">
+                <div class="my-2">
+                    <button class="btn btn-dark" (click)="addTacheAction()">Associer une tache</button>
+                </div>
+                <table class="my-3 table table-success table-striped table-bordered">
+                    <thead class="text-center">
+                        <tr>
+                            <th class="col-1">#</th>
+                            <th class="col-1">Code</th>
+                            <th class="col-2">Nom</th>
+                            <th class="col-1">Délais</th>
+                            <th class="col-4">Eléments</th>
+                            <th class="col-1">Validation</th>
+                            <th class="col-2">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let tc of taches; let i=index">
+                            <td>{{i}}</td>
+                            <td>{{tc.code}}</td>
+                            <td>{{tc.nom}}</td>
+                            <td>{{tc.delais}}</td>
+                            <td>
+                                <button class="btn btn-danger m-1 px-2 py-1" [disabled]="tachesValidated[i].stat==1" (click)="listArticles(tc)">Articles</button>
+                                <button class="btn btn-primary m-1 px-2 py-1" [disabled]="tachesValidated[i].stat==1" (click)="tache_to_edit=tc; edit_predec = true">Prédécesseurs</button>
+                            </td>
+                            <td><button class="btn btn-primary px-2 py-1" (click)="validateTache(i);tachesValidated[i].stat=1">Valider</button></td>
+                            <td>
+                                <button class="btn btn-warning mx-1 px-2 py-1" [disabled]="tachesValidated[i].stat==1" (click)="editTacheAction(tc.code)"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>
+                                <button class="btn btn-danger mx-1 px-2 py-1" [disabled]="tachesValidated[i].stat==1" (click)="deleteTacheAction(tc.code)"><i class="fa fa-trash" aria-hidden="true"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div *ngIf="err_montant" class="alert alert-danger alert-dismissible fade show my-2" role="alert">
+                  <strong>Attention</strong> le montant total des taches ({{calculeTotal()[0]}}) est differant du montant du bonde commande ({{bcSelected.montant}})
+                  <button type="button" class="btn-close" (click)="err_montant=false" aria-label="Close"></button>
+                </div>
+                <div *ngIf="err_delais" class="alert alert-danger alert-dismissible fade show my-2" role="alert">
+                  <strong>Attention</strong> la délais total des taches ({{calculeTotal()[1]}}) est différante de la délais du bonde commande ({{bcSelected.delais}})
+                  <button type="button" class="btn-close" (click)="err_delais=false" aria-label="Close"></button>
+                </div>
+                <button class="btn btn-danger" [disabled]="allValidate()==false || tachesValidated.length==0" (click)="saveTache()">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modal-confirmation" class="dialog" *ngIf="to_confirm==true && bc_confirmed==false">
+    <div class="content bg-white rounded shadow py-4 px-3 border w-50 mx-auto my-auto">
+        <h5 style="font-size: 20px; color: navy;">Confirmer la choix de la bonde commande</h5>
+        <div class="mt-4">
+            <button class="btn btn-default" (click)="to_confirm=false">Annuler</button>
+            <button class="btn btn-success mx-3" (click)="confirmInformationsBc()">Confirmer</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-add-tache" class="dialog" *ngIf="add_tache==true && bc_confirmed==true">
+    <div class="content bg-white rounded shadow py-4 px-3 border w-50 mx-auto my-auto">
+        <h5 style="font-size: 20px; color: navy;">Ajouter une tache</h5>
+        <div class="body my-3">
+            <form [formGroup]="tacheForm" (ngSubmit)="addTache()">
+                <div class="row w-100 mx-auto">
+                    <div class="col-sm form-group">
+                        <label style="color: navy;">Code</label>
+                        <input type="text" class="form-control" formControlName="code" required [ngClass]="{'is-invalid': err_codetache==true}">
+                        <div class="alert alert-danger mt-2 p-1 px-2" *ngIf="err_codetache==true&&err_msg.length>0">{{err_msg}}</div>
+                    </div>
+                </div>
+                <div class="row my-3 w-100 mx-auto">
+                    <div class="col-sm form-group">
+                        <label style="color: navy;">Nom</label>
+                        <input type="text" class="form-control" formControlName="nom" required [ngClass]="{'is-invalid': err_nomtache==true}" >
+                    </div>
+                    <div class="col-sm form-group">
+                        <label style="color: navy;">Délais</label>
+                        <input type="text" class="form-control" formControlName="delais" required [ngClass]="{'is-invalid': err_delaistache==true}" >
+                        <div class="alert alert-danger mt-2 p-1 px-2" *ngIf="err_delaistache==true&&err_msg.length>0">{{err_msg}}</div>
+                    </div>
+                
+                </div>
+                <!--<div class="row my-3 w-100 mx-auto">
+                    <div class="col-sm form-group">
+                        <div class="p-2 border">
+                            <h4 class="mt-2 mb-3" style="color: navy;">Prédécesseurs</h4>
+                            <div *ngFor="let tp of tachesPredec">
+                                <input type="checkbox" (change)="checkTask($event, null)" [value]="tp.id">
+                                <label class="mx-3" style="color: navy;">{{tp.nom}}</label>
+                                <hr class="w-75 mx-auto my-2">
+                            </div>
+                        </div>
+                    </div>
+                </div>-->
+                <div class="mt-4">
+                    <button class="btn btn-default" (click)="add_tache=false; tacheForm.reset()">Annuler</button>
+                    <button class="btn btn-success mx-3" type="submit">Ajouter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="modal-add-article" class="dialog" *ngIf="add_article==true && bc_confirmed==true">
+    <div class="content bg-white rounded shadow py-4 px-3 border w-75 mx-auto my-auto">
+        <h5 style="font-size: 20px; color: navy;">Associer un article</h5>
+        <div class="body my-3 mx-auto px-2">
+            <div class="row my-3 mx-auto">
+                <div class="col-4">
+                    <button class="rounded-pill btn w-100 btn-success" (click)="art_step=1">Ajouter un article</button>
+                </div>
+                <div class="col-4">
+                    <button class="rounded-pill btn w-100 btn-success" (click)="art_step=2">Articles ajoutés</button>
+                </div>
+                <div class="col-4">
+                    <button class="rounded-pill btn w-100 btn-success" (click)="art_step=3">Articles disponibles</button>
+                </div>
+            </div>
+            <div class="w-100 mx-auto" *ngIf="art_step==1">
+                <form [formGroup]="articleForm" (ngSubmit)="addArticle()">
+                    <div class="row w-100 mx-auto">
+                        <div class="col-sm form-group">
+                            <label style="color: navy;">Code d'article</label>
+                            <input type="text" class="form-control" formControlName="artCode" (change)="chooseArticle()" required [ngClass]="{'is-invalid': err_article==true}">
+                            <div class="alert alert-danger mt-2 p-1 px-2" *ngIf="err_article==true">{{err_msg}}</div>
+                        </div>
+                        <div class="col-sm form-group"></div>
+                    </div>
+                    <div class="row my-3 w-100 mx-auto">
+                        <div class="col-sm form-group">
+                            <label style="color: navy;">Quantité</label>
+                            <input type="text" class="form-control" formControlName="quantite" required [ngClass]="{'is-invalid': err_qtt==true}" >
+                        </div>
+                        <div class="col-sm form-group"></div>
+                    </div>
+                    <div class="row my-3 w-100 mx-auto">
+                        <p class="text-danger mx-1" *ngIf="qtt_art>-1&&qtt_no_dispo==false">Quantité disponible pour l'article sélectionné: {{qtt_art}}</p>
+                        <p class="text-danger mx-1" *ngIf="qtt_no_dispo==true">Vous avez atteint la quatité diaponible</p>
+                        <p class="text-danger mx-1" *ngIf="bcSelected.montant-calculMontantArticlesSelected()<0">Montant bonde commande restant: {{bcSelected.montant-calculMontantArticlesSelected()}}</p>
+                    </div>
+                    <div class="mt-4">
+                        <button class="btn btn-success mx-3" type="submit">Ajouter</button>
+                    </div>
+                </form>
+            </div>
+            <div class="w-100 mx-auto" *ngIf="art_step==2">
+                <table class="my-3 table table-success table-striped table-bordered">
+                    <thead class="text-center">
+                        <tr>
+                            <th class="col">Code</th>
+                            <th class="col">Désignation</th>
+                            <th class="col">Prix</th>
+                            <th class="col">Quantité</th>
+                            <th class="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-center">
+                        <tr *ngFor="let art of tacheSelected.listeArticles">
+                            <td>{{art.code}}</td>
+                            <td>{{art.designation}}</td>
+                            <td>{{art.prix}}</td>
+                            <td>{{art.quantitee}}</td>
+                            <td>
+                                <button class="btn btn-danger mx-1 px-2 py-1" (click)="deleteArticle(art.code)"><i class="fa fa-trash" aria-hidden="true"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="w-100 mx-auto" *ngIf="art_step==3">
+                <table class="my-3 table table-primary table-striped table-bordered">
+                    <thead class="text-center">
+                        <tr>
+                            <th class="col">Code</th>
+                            <th class="col">Désignation</th>
+                            <th class="col">Prix unitaire</th>
+                            <th class="col">Quantité Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let art of bcSelected.articlesassociation">
+                            <td>{{art.id.code}}</td>
+                            <td>{{art.id.designation}}</td>
+                            <td>{{art.prix}}</td>
+                            <td>{{calculeQuantiteArticleDispo(null, art.id.id)}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="bottom-no my-2 mx-5">
+            <button class="btn btn-default" (click)="add_article=false">Annuler</button>
+            <button class="btn btn-primary mx-3" type="submit" (click)="saveArticlesAdding();">Enregistrer</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-add-predec" class="dialog" *ngIf="edit_predec==true && bc_confirmed==true">
+    <div class="content bg-white rounded shadow py-4 px-3 border w-75 mx-auto my-auto">
+        <h5 style="font-size: 20px; color: navy;">Associer des prédécesseurs</h5>
+        <div class="body my-3 mx-auto px-2">
+            <div class="row my-3 w-100 mx-auto">
+                <div class="col-sm form-group">
+                    <div class="p-2 border">
+                        <h4 class="mt-2 mb-3" style="color: navy;">Prédécesseurs</h4>
+                        <div *ngFor="let tp of tachesPredec" class="my-1">
+                            <input
+                                type="checkbox"
+                                [checked]="verifyCheck(tache_to_edit.code, tp.id)"
+                                (change)="checkTask($event, tache_to_edit.code)"
+                                [value]="tp.id"
+                            >
+                            <label class="mx-3" style="color: navy;">{{tp.nom}}</label>
+                            <hr class="w-75 mx-auto my-2">
+                        </div>
+                    </div>
+                    <div class="my-2" *ngIf="err_datetache==true&&err_msg.length>0">
+                        <div class="alert alert-danger mt-2 p-1 px-2">{{err_msg}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="bottom my-2 mx-5">
+            <button class="btn btn-default" (click)="edit_predec=false">Annuler</button>
+            <button class="btn btn-primary mx-3" type="submit" (click)="editTache(0);">Enregistrer</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-edit-tache" class="dialog" *ngIf="edit_tache==true && bc_confirmed==true">
+    <div class="content bg-white rounded shadow py-4 px-3 border w-50 mx-auto my-auto">
+        <h5 style="font-size: 20px; color: navy;">Modifier une tache</h5>
+        <div class="body my-3">
+            <form [formGroup]="editTacheForm" (ngSubmit)="editTache(1)">
+                <div class="row w-100 mx-auto">
+                    <div class="col-sm form-group">
+                        <label style="color: navy;">Code</label>
+                        <input type="text" class="form-control" formControlName="code" required [ngClass]="{'is-invalid': err_codetache==true}">
+                        <div class="alert alert-danger mt-2 p-1 px-2" *ngIf="err_codetache==true&&err_msg.length>0">{{err_msg}}</div>
+                    </div>
+                </div>
+                <div class="row my-3 w-100 mx-auto">
+                    <div class="col-sm form-group">
+                        <label style="color: navy;">Nom</label>
+                        <input type="text" class="form-control" formControlName="nom" required [ngClass]="{'is-invalid': err_nomtache==true}" >
+                    </div>
+                    <div class="col-sm form-group">
+                        <label style="color: navy;">Délais</label>
+                        <input type="text" class="form-control" formControlName="delais" required [ngClass]="{'is-invalid': err_delaistache==true}" >
+                        <div class="alert alert-danger mt-2 p-1 px-2" *ngIf="err_delaistache==true&&err_msg.length>0">{{err_msg}}</div>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <button class="btn btn-default" (click)="edit_tache=false; editTacheForm.reset()">Annuler</button>
+                    <button class="btn btn-success mx-3" type="submit">Modifier</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="modal-edit-tache" class="dialog" *ngIf="delete_tache==true && bc_confirmed==true">
+    <div class="content bg-white rounded shadow py-4 px-3 border w-50 mx-auto my-auto">
+        <h5 style="font-size: 20px; color: navy;">Supprimer une tache</h5>
+        <div class="body my-3">
+            <p>Voulez vous supprimer cette tache?</p>
+            <div class="mt-4">
+                <button class="btn btn-default" (click)="delete_tache=false">Annuler</button>
+                <button class="btn btn-danger mx-3" type="submit" (click)="deleteTache()">Supprimer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="toast"><div id="img">Succée</div><div id="desc">Informations enregistreés avec succé .</div></div>
+<div id="toast-token"><div class="img">Succée</div><div class="desc">Cette tache est enregistrée comme une jeton .</div></div>
+
